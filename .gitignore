@@ -1,0 +1,15 @@
+# Package Files #
+build/
+target/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Gradle
+.gradle/
+
+# Java
+!gradle/wrapper/gradle-wrapper.jar

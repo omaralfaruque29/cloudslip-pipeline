@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudslip-pipeline-service
+  namespace: cloudslip
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudslip-pipeline-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  minReadySeconds: 25
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: "/prometheus"
+        prometheus.io/port: '8081'
+        prometheus.io/scrape: 'true'
+      labels:
+        app: cloudslip-pipeline-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: cloudslip-pipeline-service
+        imagePullPolicy: Always
+        image: cloudslip/cloudslip-pipeline-service:latest
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1024Mi
+          limits:
+            cpu: 1500m
+            memory: 2048Mi
+        env:
+        - name: MONGO_SERVER
+          value: "72.22.68.40"
+        - name: MONGO_PORT
+          value: "27017"
+        - name: MONGO_AUTH_DATABASE
+          value: "admin"
+        - name: MONGO_USERNAME
+          value: "mongoAdmin"
+        - name: MONGO_PASSWORD
+          value: "abc123"
+        - name: JENKINS_SERVER
+          value: "35.239.103.165"
+        - name: JENKINS_PORT
+          value: "8080"
+        - name: JENKINS_USER
+          value: "admin"
+        - name: JENKINS_TOKEN
+          value: "11b6daa5b42aec91da8202c456be6cf934"
+        - name: KAFKA_SERVER
+          value: "72.22.68.40"
+        - name: KAFKA_PORT
+          value: "9092"
+        - name: ZOO_KEEPER_PORT
+          value: "2181"
+        - name: CLOUDSLIP_FACADE_SERVICE_DOMAIN
+          value: "facade.cloudslip.io"
+        - name: CLOUDSLIP_FACADE_SERVICE_NAME
+          value: "cloudslip-facade-service"
+        - name: CLOUDSLIP_FACADE_SERVICE_API_ACCESS_TOKEN
+          value: "58490a441baeecadf4721d047b7f8918a0127f5f2d2593d7d8055cd3683a3e7alOZAIwNsex"
+        - name: CONNECT_TO_CLOUDSLIP_FACADE_WEB_SOCKET
+          value: "true"
+        - name: CLOUDSLIP_USER_MANAGEMENT_SERVICE_NAME
+          value: "cloudslip-usermanagement-service"
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      imagePullSecrets:
+      - name: regcred

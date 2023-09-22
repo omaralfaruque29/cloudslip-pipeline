@@ -1,0 +1,5 @@
+sudo docker build -t dckreg:5000/cloudslip-pipeline:latest .
+sudo docker push dckreg:5000/cloudslip-pipeline:latest
+
+sed -ie 's/THIS_STRING_IS_REPLACED_DURING_BUILD/${COMMIT_HASH}/g' kube-deploy.yml
+kubectl apply -f kube-deploy.yml

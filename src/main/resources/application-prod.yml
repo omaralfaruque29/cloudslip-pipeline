@@ -1,0 +1,84 @@
+application:
+  name: cloudslip-pipeline
+  message: Welcome to cloudslip-pipeline
+server:
+  port: 8080
+
+developer:
+  alias: cloudslip
+
+management:
+  endpoint:
+    metrics.enabled: true
+    prometheus.enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: \\*
+  metrics:
+    export.prometheus.enabled: true
+  security:
+    enabled: false
+
+jenkins:
+  url: http://${JENKINS_SERVER}:${JENKINS_PORT}
+  user: ${JENKINS_USER}
+  token: ${JENKINS_TOKEN}
+  app-build-trigger: AUTOMATIC
+
+github:
+  token: 8efb86ab08731130f8ccdb4e66783ae6838efa55
+  webhook-url:  http://${CLOUDSLIP_FACADE_SERVICE_DOMAIN}/api/app-commit-state/generate-state
+  commitSyncLimit: 20
+
+pipeline-step:
+  update-status-url : http://${CLOUDSLIP_FACADE_SERVICE_DOMAIN}/api/app-pipeline-step/update-status
+
+kubernetes:
+  url: https://72.22.68.40:443
+  port: 443
+  auth.token: RwGrYX7122SzpBR7w2hy0LqvET8ZLJN
+
+spring:
+  application:
+    name: cloudslip-pipeline
+  data:
+    mongodb:
+      host: ${MONGO_SERVER}
+      port: ${MONGO_PORT}
+      authentication-database: ${MONGO_AUTH_DATABASE}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+      database: cloudslip_pipeline
+
+cloudslip:
+  kafka:
+    ssl:
+      enabled: false
+      security-protocol: "SSL"
+      protocols: "TLSv1.2"
+      truststore-location: "/app/cert/kafka-truststore.jks"
+      keystore-location: "/app/cert/kafka-keystore.jks"
+      keystore-password: ""
+      truststore-password: ""
+      key-password: ""
+    producer:
+      bootstrap-servers: ${KAFKA_SERVER}:${KAFKA_PORT}
+      client-id: ${spring.application.name}
+      compression-type: snappy
+      acks: 1
+      retries: 3
+      linger-ms: 1
+      batch-size: 16384
+      buffer-memory: 30080000
+      max-request-size: 30080000
+      request-timeout-ms: 60000
+    run-vpc-agent-response-fetch-scheduler: true
+
+env:
+  facade-service:
+    base-url: http://${CLOUDSLIP_FACADE_SERVICE_NAME}/
+    api-access-token: ${CLOUDSLIP_FACADE_SERVICE_API_ACCESS_TOKEN}
+    connect-to-web-socket: ${CONNECT_TO_CLOUDSLIP_FACADE_WEB_SOCKET}
+  usermanagement-service:
+    base-url: http://${CLOUDSLIP_USER_MANAGEMENT_SERVICE_NAME}/
